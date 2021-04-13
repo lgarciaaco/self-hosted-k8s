@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-storage-pvc
+  namespace: wiki
+  labels:
+    app.kubernetes.io/instance: database
+    app.kubernetes.io/name: wiki
+    vol: postgres-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-path

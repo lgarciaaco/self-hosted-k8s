@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-deployment
+  namespace: wiki
+  labels:
+    app.kubernetes.io/name: wiki
+    app.kubernetes.io/instance: web
+    app.kubernetes.io/version: v2.5
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wiki
+      app.kubernetes.io/instance: web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wiki
+        app.kubernetes.io/instance: web
+        app.kubernetes.io/version: v2.5
+    spec:
+      containers:
+        - name: wiki-deployment
+          image: requarks/wiki:2.5
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: DB_TYPE
+              value: postgres
+            - name: DB_HOST
+              value: postgres-service.wiki
+            - name: DB_NAME
+              value: wiki
+            - name: DB_USER
+              value: wiki
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: wiki-postgres-secret
+                  key: POSTGRES_PASSWORD
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          volumeMounts:
+            - mountPath: /wiki/backups
+              name: wiki-backup
+      volumes:
+        - name: wiki-backup
+          persistentVolumeClaim:
+            claimName: wiki-backup-storage-pvc

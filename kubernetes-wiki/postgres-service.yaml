@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: wiki
+spec:
+  selector: 
+    app.kubernetes.io/name: wiki
+    app.kubernetes.io/instance: database
+  type: ClusterIP  
+  ports:
+    - port: 5432
+      targetPort: 5432 

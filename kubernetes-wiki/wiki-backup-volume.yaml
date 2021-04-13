@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wiki-backup-storage-pvc
+  namespace: wiki
+  labels:
+    app.kubernetes.io/instance: web
+    app.kubernetes.io/name: wiki
+    vol: wiki-backup-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: managed-nfs-storage
