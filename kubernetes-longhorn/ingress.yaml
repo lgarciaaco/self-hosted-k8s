@@ -1,0 +1,15 @@
+# dashboard.yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: longhorn-ingress
+  namespace: longhorn-system
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`longhorn.local`)
+      kind: Rule
+      services:
+        - name: longhorn-frontend
+          port: 80
