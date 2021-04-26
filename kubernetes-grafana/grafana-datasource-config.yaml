@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: monitoring
+data:
+  prometheus.yaml: |-
+    {
+        "apiVersion": 1,
+        "datasources": [
+            {
+               "access":"proxy",
+               "editable": true,
+               "name": "Prometheus",
+               "orgId": 1,
+               "type": "prometheus",
+               "url": "http://prometheus.local",
+               "version": 1
+            },
+            {
+               "access":"proxy",
+               "editable": true,
+               "name":"InfluxDB",
+               "orgId":1,
+               "type":"influxdb",
+               "url":"http://influxdb.local",
+               "password":"",
+               "user":"",
+               "database":"",
+               "basicAuth":false,
+               "basicAuthUser":"",
+               "basicAuthPassword":"",
+               "token":"jpx6HqFFDFysTSQLONSlilxcLTCGiMy62z4sQLn7leWvd2tguqvhUgZcjmoaWEoGwVCkufuE077KdBHp-RpEew==",
+               "withCredentials":false,
+               "isDefault":false,
+               "jsonData":{
+                  "defaultBucket":"openhab",
+                  "httpMode":"POST",
+                  "organization":"home",
+                  "version":"Flux"
+               },
+               "version":1,
+            }
+        ]
+    }
