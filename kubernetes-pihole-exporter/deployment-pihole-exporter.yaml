@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole-exporter-deployment
+  namespace: monitoring
+  labels:
+    app: pihole-exporter
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: pihole-exporter
+  template:
+    metadata:
+      name: pihole-exporter
+      labels:
+        app: pihole-exporter
+    spec:
+      containers:
+      - name: pihole-exporter
+        image: ivanarsenijevic/pihole-exporter:arm
+        env:
+          - name: PIHOLE_HOSTNAME
+            value: "192.168.107.31"
+          - name: PIHOLE_API_TOKEN
+            value: 2642e7f9d14676f9f1149efcbc3ed7cecc6b2f956f4729fa6ee63b3964709f1f
+        ports:
+          - name: httpexporter
+            containerPort: 9617
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: httpexporter
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: httpexporter
