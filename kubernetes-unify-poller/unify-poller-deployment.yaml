@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unify-poller-deployment
+  namespace: unify-poller
+  labels:
+    app: unify-poller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unify-poller
+  template:
+    metadata:
+      labels:
+        app: unify-poller
+    spec:
+      containers:
+        - name: unify-poller
+          image: golift/unifi-poller:latest
+          ports:
+            - name: metrics
+              containerPort: 9130
+            - name: web
+              containerPort: 37288
+          volumeMounts:
+            - name: unify-poller-config-volume
+              mountPath: /etc/unifi-poller/
+      volumes:
+        - name: unify-poller-config-volume
+          configMap:
+            defaultMode: 420
+            name: unify-poller-conf
