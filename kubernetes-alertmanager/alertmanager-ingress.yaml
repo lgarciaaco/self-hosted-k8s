@@ -1,0 +1,15 @@
+# dashboard.yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: alertmanager-ingress
+  namespace: monitoring
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`alertmanager.local`)
+      kind: Rule
+      services:
+        - name: alertmanager-service
+          port: 9093
