@@ -1,0 +1,90 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud-server
+  namespace: nextcloud
+  labels:
+    app.kubernetes.io/name: nextcloud
+    app.kubernetes.io/instance: server
+    app.kubernetes.io/version: v21.0.1
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nextcloud
+      app.kubernetes.io/instance: server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nextcloud
+        app.kubernetes.io/instance: server
+        app.kubernetes.io/version: v21.0.1
+    spec:
+      containers:
+      - name: nextcloud
+        image: nextcloud:21.0.1-apache
+        env:
+        - name: POSTGRES_DB
+          value: nextcloud
+        - name: POSTGRES_USER
+          value: nextcloud
+        - name: POSTGRES_HOST
+          value: nextcloud-db-service.nextcloud
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: nextcloud-db-secret
+              key: POSTGRES_PASSWORD
+        - name: NEXTCLOUD_TRUSTED_DOMAINS
+          value: "nextcloud.local"
+        - name: NEXTCLOUD_ADMIN_USER
+          value: lgarciaac
+        - name: NEXTCLOUD_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: nextcloud-admin-secret
+              key: NEXTCLOUD_ADMIN_PASSWORD
+        volumeMounts:
+        - name: server-storage
+          mountPath: /var/www/html
+          subPath: server-data
+      volumes:
+      - name: server-storage
+        persistentVolumeClaim:
+          claimName: nextcloud-server-storage-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-service
+  namespace: nextcloud
+  labels:
+    app.kubernetes.io/name: nextcloud
+    app.kubernetes.io/instance: server
+    app.kubernetes.io/version: v21.0.1
+spec:
+  selector:
+    app.kubernetes.io/name: nextcloud
+    app.kubernetes.io/instance: server
+  ports:
+  - protocol: TCP
+    port: 80
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud-server-storage-pvc
+  namespace: nextcloud
+  labels:
+    app.kubernetes.io/name: nextcloud
+    app.kubernetes.io/instance: server
+    app.kubernetes.io/version: v21.0.1
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 5Gi
